@@ -8,6 +8,7 @@
 using namespace std;
 enum
 { MENU = 1, GAME = 2, OVER = 3, TOP = 4, SETTING = 5, EXIT = 9 };
+int timelimit=30;//超时，单位秒，
 
 /*
  * 产生4个随机数，并计算出正确答案，返回是否能得到24点，
@@ -110,7 +111,7 @@ int game(int times)
 	score = 0;					// 初始化，
 	while (times-- > 0)
 	{
-		cout << "\n\n\n\n";
+		cls();
 		can = calc24(n, answer);	// 产生4个随机数，并计算出正确答案，返回是否能得到24点，
 		cout << n[0];			// 
 		for (int i = 1; i < 4; ++i)
@@ -122,7 +123,8 @@ int game(int times)
 		cout << "输入含有这4 个数字的一个完整计算式子，" << endl;
 		cout << "并且只能使用加、减、乘、除和括号，" << endl;
 		cout << "这四个数无法经过计算得到24，则输入0，" << endl;
-		cout << "认输则输入=，" << endl;	// 输出提示信息，
+		cout << "认输则输入=，" << endl;
+		cout<<"超过 "<<timelimit<<" 秒就算失败，"<<endl;	// 输出提示信息，
 		tstart = time(0);		// 开始计时，
 		cin >> player;			// 玩家输入答案，
 		tend = time(0);			// 计时结束，
@@ -134,14 +136,21 @@ int game(int times)
 		{
 			right = calc(n, player, can);	// 计算并返回玩家答案是否正确，
 		}
-
+		
+		cout<<"---------------"<<endl;//分割线，
 		cout << "这题做了 " << tend - tstart << " 秒，" << endl;
+		if(tend-tstart>timelimit)//超时提醒，
+		{
+			cout<<"可惜，超时了，"<<endl;
+		}
 		if (right)				// 如果正确，继续，
 		{
-			++score;
-			cout << "恭喜你，答案正确，" << endl;
+			if(tend-tstart<=timelimit)//没超时则加一分，
+			{
+				++score;
+			}
+			cout << "答案正确，" << endl;
 			cout << player << " == 24 " << endl;
-			cout << "目前共计答对 " << score << " 道题，" << endl;
 		}
 		else					// 如果错误，游戏结束，
 		{
@@ -156,6 +165,8 @@ int game(int times)
 				cout << "其实这4个数字是得不到24点的，" << endl;
 			}
 		}
+		cout << "目前共计答对 " << score << " 道题，" << endl;
+		stop();
 	}
 	return score;
 }
@@ -178,12 +189,13 @@ void over(int score)
 		in >> tname >> tscore;
 		if (!win && (in.eof() || score > tscore))	// 没入榜的前提下，文件结束(榜上的玩家不够5人)，或分数足够大，则入榜，
 		{
-			cout << "恭喜你，夺得了第 " << i << " 名" << endl;
+			cout << "恭喜你，以 "<<score<<" 分的成绩，夺得了第 " << i << " 名" << endl;
 			cout << "请输入你的名字，" << endl;
 			cin >> name;
 			out << name << " " << score << endl;
 			cout<<"记录完成，"<<endl;
 			win = true;//标记已入榜，下次循环不进这里，
+			stop();
 		}
 		if (in.eof())			// 文件结束则跳出循环，此次读取失败所以不写入临时文件，
 		{
@@ -198,7 +210,6 @@ void over(int score)
 	out << in.rdbuf();
 	in.close();
 	out.close();				// 把临时文件复制到数据文件，
-	stop();
 }
 
 void setting(int &times)
@@ -245,6 +256,7 @@ int main()
 	int flag;
 	int times = 10;
 	flag = MENU;
+	srand(time(0));
 	cls();
 	while (flag)
 	{
