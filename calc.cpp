@@ -1,89 +1,274 @@
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <cstdio>
 #include <time.h>
+#define DATA "calc24.dat"
+#define TEMP "calc24.dat~"
 using namespace std;
-/*
-²úÉú4¸öËæ»úÊı£¬²¢¼ÆËã³öÕıÈ·´ğ°¸£¬·µ»ØÊÇ·ñÄÜµÃµ½24µã£¬
-Êı×énÓĞ4¸öint¿Õ¼ä£¬±£´æÕâ4¸öËæ»úÊı£¬
-str±£´æÒ»ÖÖÕıÈ·Çé¿ö£¬
-·µ»Øbool£¬
-ÄÜËã³ö24µãÔò·µ»ØÕæ£¬
-·ñÔò·µ»Ø¼Ù£¬
-*/
-bool calc24(int *n,string &str)
+enum
+{ MENU = 1, GAME = 2, OVER = 3, TOP = 4, SETTING = 5, EXIT = 9 };
+
+/* 
+ * äº§ç”Ÿ4ä¸ªéšæœºæ•°ï¼Œå¹¶è®¡ç®—å‡ºæ­£ç¡®ç­”æ¡ˆï¼Œè¿”å›æ˜¯å¦èƒ½å¾—åˆ°24ç‚¹ï¼Œ
+ * æ•°ç»„næœ‰4ä¸ªintç©ºé—´ï¼Œä¿å­˜è¿™4ä¸ªéšæœºæ•°ï¼Œ
+ * strä¿å­˜ä¸€ç§æ­£ç¡®æƒ…å†µï¼Œ è¿”å›boolï¼Œ èƒ½ç®—å‡º24ç‚¹åˆ™è¿”å›çœŸï¼Œ
+ * å¦åˆ™è¿”å›å‡ï¼Œ 
+ */
+bool calc24(int *n, string & str)
 {
-	n[0]=1;
-	n[1]=3;
-	n[2]=5;
-	n[3]=7;
-	str="correct answer...";
+	n[0] = 1;
+	n[1] = 3;
+	n[2] = 5;
+	n[3] = 7;
+	str = "correct answer...";
 	return true;
 }
-/*
-Êı×én´æ×ÅÓÃÀ´¼ÆËã24µãµÄÄÇ4¸öÊı×Ö£¬
-str´æÍæ¼ÒµÄÊäÈë£¬
-b´æÄÇ4¸öÊıÄÜ·ñËã³ö24µã£¬
-·µ»Ø´ğ°¸ÊÇ·ñÕıÈ·£¬
-*/
-bool calc(const int *n,const string &str,bool b)
+
+/* 
+ * æ•°ç»„nå­˜ç€ç”¨æ¥è®¡ç®—24ç‚¹çš„é‚£4ä¸ªæ•°å­—ï¼Œ strå­˜ç©å®¶çš„è¾“å…¥ï¼Œ
+ * bå­˜é‚£4ä¸ªæ•°èƒ½å¦ç®—å‡º24ç‚¹ï¼Œ è¿”å›ç­”æ¡ˆæ˜¯å¦æ­£ç¡®ï¼Œ 
+ */
+bool calc(const int *n, const string & str, bool b)
 {
 	return true;
 }
 
-int main()
+/* 
+   æ¸…å±å‡½æ•°ï¼Œ */
+void cls()
 {
-	int n[4];//´æ4¸ö1-10µÄËæ»úÊı£¬
-	string answer;//´æÕıÈ·´ğ°¸£¬
-	string player;//´æÍæ¼ÒµÄ´ğ°¸£¬
-	bool can;//´æÊÇ·ñÄÜµÃµ½24µã£¬
-	bool right;//´æÍæ¼Ò´ğ°¸ÊÇ·ñÕıÈ·£¬
-	int tstart,tend;//¼ÆÊ±£¬
-	int total;//Ê¤Àû´ÎÊı£¬
-	bool win;//ÊÇ·ñÒ»Ö±Ê¤Àû£¬
-	
-	win=true;
-	while(win)
+#ifdef WIN32
+	system("cls");
+#else
+	cout << "\033[2J\033[0;0H";
+#endif
+}
+
+/* 
+   æš‚åœå‡½æ•°ï¼Œ */
+void stop()
+{
+	cout << "è¾“å…¥å›è½¦ç»§ç»­ï¼Œ" << endl;
+	cin.ignore(100, '\n');
+	cin.get();
+}
+
+int menu()
+{
+	cout << "****************************" << endl;
+	cout << "*\t1,å¼€å§‹æ¸¸æˆï¼Œ" << endl;
+	cout << "*\t2,è®¾ç½®æ¸¸æˆæ¬¡æ•°ï¼Œ" << endl;
+	cout << "*\t3,æ’åï¼Œ" << endl;
+	cout << "*\t4,ç¦»å¼€æ¸¸æˆï¼Œ" << endl;
+	cout << "****************************" << endl;
+	bool flag = true;
+	while (flag)
 	{
-		total=0;//³õÊ¼»¯£¬
-		can=calc24(n,answer);//²úÉú4¸öËæ»úÊı£¬²¢¼ÆËã³öÕıÈ·´ğ°¸£¬·µ»ØÊÇ·ñÄÜµÃµ½24µã£¬
-		cout<<n[0];//
-		for(int i=1;i<4;++i)
+		int choise = 0;
+		cin >> choise;
+		switch (choise)
 		{
-			cout<<";"<<n[i];
+		case 1:
+			return GAME;
+			break;
+		case 2:
+			return SETTING;
+			break;
+		case 3:
+			return TOP;
+			break;
+		case 4:
+			return EXIT;
+			break;
+		default:
+			cout << "è¾“å…¥é”™è¯¯ï¼Œé‡æ–°è¾“å…¥ï¼Œ" << endl;
+			cin.clear();
+			cin.ignore(100, '\n');
+			break;
 		}
-		cout<<endl;//Êä³ö4¸öËæ»úÊı£¬
-		cout<<"¼ÆËã24µã"<<endl;//
-		cout<<"ÊäÈëº¬ÓĞÕâ4 ¸öÊı×ÖµÄÒ»¸öÍêÕû¼ÆËãÊ½×Ó£¬"<<endl;
-		cout<<"²¢ÇÒÖ»ÄÜÊ¹ÓÃ¼Ó¡¢¼õ¡¢³Ë¡¢³ıºÍÀ¨ºÅ£¬"<<endl;
-		cout<<"ÕâËÄ¸öÊıÎŞ·¨¾­¹ı¼ÆËãµÃµ½24£¬ÔòÊäÈë0£¬"<<endl;//Êä³öÌáÊ¾ĞÅÏ¢£¬
-		tstart=time(0);//¿ªÊ¼¼ÆÊ±£¬
-		cin>>player;//Íæ¼ÒÊäÈë´ğ°¸£¬
-		tend=time(0);//¼ÆÊ±½áÊø£¬
-		right=calc(n,player,can);//¼ÆËã²¢·µ»ØÍæ¼Ò´ğ°¸ÊÇ·ñÕıÈ·£¬
-		
-		cout<<"ÕâÌâ×öÁË "<<tend-tstart<<" Ãë£¬"<<endl;
-		if(right)
+	}
+	return EXIT;
+}
+
+/* 
+ * æ¸¸æˆæœ¬ä½“ï¼Œ å‚æ•°timesè¡¨ç¤ºæ¸¸æˆçš„æ¬¡æ•°ï¼Œ
+ * è¿”å›èƒœåˆ©çš„æ¬¡æ•°ï¼Œ 
+ */
+int game(int times)
+{
+	int n[4];					// å­˜4ä¸ª1-10çš„éšæœºæ•°ï¼Œ
+	string answer;				// å­˜æ­£ç¡®ç­”æ¡ˆï¼Œ
+	string player;				// å­˜ç©å®¶çš„ç­”æ¡ˆï¼Œ
+	bool can;					// å­˜æ˜¯å¦èƒ½å¾—åˆ°24ç‚¹ï¼Œ
+	bool right;					// å­˜ç©å®¶ç­”æ¡ˆæ˜¯å¦æ­£ç¡®ï¼Œ
+	int tstart, tend;			// è®¡æ—¶ï¼Œ
+	int score;					// èƒœåˆ©æ¬¡æ•°ï¼Œ
+
+	score = 0;					// åˆå§‹åŒ–ï¼Œ
+	while (times-- > 0)
+	{
+		cout << "\n\n\n\n";
+		can = calc24(n, answer);	// äº§ç”Ÿ4ä¸ªéšæœºæ•°ï¼Œå¹¶è®¡ç®—å‡ºæ­£ç¡®ç­”æ¡ˆï¼Œè¿”å›æ˜¯å¦èƒ½å¾—åˆ°24ç‚¹ï¼Œ
+		cout << n[0];			// 
+		for (int i = 1; i < 4; ++i)
 		{
-			++total;
-			cout<<"¹§Ï²Äã£¬´ğ°¸ÕıÈ·£¬"<<endl;
-			cout<<player<<" == 24 "<<endl;
-			cout<<"Ä¿Ç°¹²¼Æ´ğ¶Ô "<<total<<" µÀÌâ"<<endl;
+			cout << ";" << n[i];
+		}
+		cout << endl;			// è¾“å‡º4ä¸ªéšæœºæ•°ï¼Œ
+		cout << "è®¡ç®—24ç‚¹ï¼Œ" << endl;	// 
+		cout << "è¾“å…¥å«æœ‰è¿™4 ä¸ªæ•°å­—çš„ä¸€ä¸ªå®Œæ•´è®¡ç®—å¼å­ï¼Œ" << endl;
+		cout << "å¹¶ä¸”åªèƒ½ä½¿ç”¨åŠ ã€å‡ã€ä¹˜ã€é™¤å’Œæ‹¬å·ï¼Œ" << endl;
+		cout << "è¿™å››ä¸ªæ•°æ— æ³•ç»è¿‡è®¡ç®—å¾—åˆ°24ï¼Œåˆ™è¾“å…¥0ï¼Œ" << endl;
+		cout << "è®¤è¾“åˆ™è¾“å…¥=ï¼Œ" << endl;	// è¾“å‡ºæç¤ºä¿¡æ¯ï¼Œ
+		tstart = time(0);		// å¼€å§‹è®¡æ—¶ï¼Œ
+		cin >> player;			// ç©å®¶è¾“å…¥ç­”æ¡ˆï¼Œ
+		tend = time(0);			// è®¡æ—¶ç»“æŸï¼Œ
+		if (player == "=")
+		{
+			right = false;
 		}
 		else
 		{
-			cout<<"ºÜÒÅº¶£¬´ğ°¸´íÎó£¬"<<endl;
-			win=false;
-			if(can)
+			right = calc(n, player, can);	// è®¡ç®—å¹¶è¿”å›ç©å®¶ç­”æ¡ˆæ˜¯å¦æ­£ç¡®ï¼Œ
+		}
+
+		cout << "è¿™é¢˜åšäº† " << tend - tstart << " ç§’ï¼Œ" << endl;
+		if (right)				// å¦‚æœæ­£ç¡®ï¼Œç»§ç»­ï¼Œ
+		{
+			++score;
+			cout << "æ­å–œä½ ï¼Œç­”æ¡ˆæ­£ç¡®ï¼Œ" << endl;
+			cout << player << " == 24 " << endl;
+			cout << "ç›®å‰å…±è®¡ç­”å¯¹ " << score << " é“é¢˜ï¼Œ" << endl;
+		}
+		else					// å¦‚æœé”™è¯¯ï¼Œæ¸¸æˆç»“æŸï¼Œ
+		{
+			cout << "å¾ˆé—æ†¾ï¼Œç­”æ¡ˆé”™è¯¯ï¼Œ" << endl;
+			if (can)			// å¦‚æœæœ‰ç­”æ¡ˆï¼Œè¾“å‡ºæ­£ç¡®ç­”æ¡ˆï¼Œ
 			{
-				cout<<"µÃµ½24µãµÄÕıÈ·×ËÊÆÎª£¬"<<endl;
-				cout<<answer<<endl;
+				cout << "å¾—åˆ°24ç‚¹çš„æ­£ç¡®å§¿åŠ¿ä¸ºï¼Œ" << endl;
+				cout << answer << endl;
 			}
-			else
+			else				// å¦‚æœæ²¡ç­”æ¡ˆï¼Œ
 			{
-				cout<<"ÆäÊµÕâ4¸öÊı×ÖÊÇµÃ²»µ½24µãµÄ£¬"<<endl;
+				cout << "å…¶å®è¿™4ä¸ªæ•°å­—æ˜¯å¾—ä¸åˆ°24ç‚¹çš„ï¼Œ" << endl;
 			}
 		}
 	}
-	return 0;
+	return score;
+}
+
+/* 
+ * æ¸¸æˆç»“æŸæ—¶ï¼Œè®°å½•æ’åï¼Œ 
+ */
+void over(int score)
+{
+	ifstream in;
+	ofstream out;
+	string name;				// å½“å‰ç©å®¶çš„åå­—ï¼Œä¸Šæ’è¡Œæ¦œçš„è¯è¦è¾“å…¥åå­—ï¼Œ
+	string tname;				// 
+	int tscore;					// ä¸´æ—¶çš„åå­—å’Œåˆ†æ•°ï¼Œå­˜æ’åé‡Œçš„åå­—å’Œåˆ†æ•°ï¼Œ
+	bool win = false;			// æ˜¯å¦å…¥æ¦œï¼Œ
+	in.open(DATA);//è¯»æ‰“å¼€æ•°æ®æ–‡ä»¶ï¼Œ
+	out.open(TEMP);//å†™æ‰“å¼€ä¸´æ—¶æ–‡ä»¶ï¼Œ
+	for (int i = 1; i <= 5; ++i)
+	{
+		in >> tname >> tscore;
+		if (!win && (in.eof() || score > tscore))//æ²¡å…¥æ¦œçš„å‰æä¸‹ï¼Œæ–‡ä»¶ç»“æŸ(æ¦œä¸Šçš„ç©å®¶ä¸å¤Ÿ5äºº)ï¼Œæˆ–åˆ†æ•°è¶³å¤Ÿå¤§ï¼Œåˆ™å…¥æ¦œï¼Œ
+		{
+			cout << "æ­å–œä½ ï¼Œå¤ºå¾—äº†ç¬¬ " << i << " å" << endl;
+			cout << "è¯·è¾“å…¥ä½ çš„åå­—ï¼Œ" << endl;
+			cin >> name;
+			out << name << " " << score << endl;
+			win = true;
+		}
+		if(!in.eof())//æ–‡ä»¶ç»“æŸåˆ™è·³å‡ºå¾ªç¯ï¼Œæ­¤æ¬¡è¯»å–å¤±è´¥æ‰€ä»¥ä¸å†™å…¥ä¸´æ—¶æ–‡ä»¶ï¼Œ
+		{
+			break;
+		}
+		out << tname << " " << tscore << endl;
+	}
+	in.close();//
+	out.close();//å…³é—­ä¸¤ä¸ªæ–‡ä»¶ï¼Œ
+	in.open(TEMP);//
+	out.open(DATA);
+	out << in.rdbuf();
+	in.close();
+	out.close();//æŠŠä¸´æ—¶æ–‡ä»¶å¤åˆ¶åˆ°æ•°æ®æ–‡ä»¶ï¼Œ
+}
+
+void setting(int &times)
+{
+	cout << "è¾“å…¥æ¸¸æˆæ¬¡æ•°ï¼Œ" << endl;
+	bool flag = true;
+	while (flag)
+	{
+		cin >> times;
+		if (!cin.good())
+		{
+			cin.clear();
+			cin.ignore(100, '\n');
+			cout << "è¾“å…¥é”™è¯¯ï¼Œé‡æ–°è¾“å…¥ï¼Œ" << endl;
+		}
+		else
+		{
+			flag = false;
+		}
+	}
+	cout << "æ¸¸æˆæ¬¡æ•°è®¾ç½®ä¸º " << times << " æ¬¡ï¼Œ" << endl;
+	stop();
+}
+
+void top()
+{
+	ifstream in;
+	in.open(DATA);
+	string name;
+	int score;
+	in >> name >> score;
+	for (int i = 1; !in.eof() && i <= 5; ++i)
+	{
+		cout << "ç¬¬ " << i << " åä¸º " << name << " ï¼Œåˆ†æ•°ä¸º " << score << " ï¼Œ" << endl;
+		in >> name >> score;
+	}
+	in.close();
+	stop();
+}
+
+int main()
+{
+	int score;
+	int flag;
+	int times = 10;
+	flag = MENU;
+	cls();
+	while (flag)
+	{
+		switch (flag)
+		{
+		case MENU:
+			flag = menu();
+			break;
+		case GAME:
+			score = game(times);
+			flag = OVER;
+			break;
+		case OVER:
+			over(score);
+			flag = MENU;
+			break;
+		case SETTING:
+			setting(times);
+			flag = MENU;
+			break;
+		case TOP:
+			top();
+			flag = MENU;
+			break;
+		case EXIT:
+			flag = 0;
+			break;
+		}
+		cls();
+	}
 }
