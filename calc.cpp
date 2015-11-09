@@ -187,7 +187,7 @@ void over(int score)
 	for (int i = 1; i <= 5; ++i)//循环5次，只记录5人，
 	{
 		in >> tname >> tscore;
-		if (!win && (in.eof() || score > tscore))	// 没入榜的前提下，文件结束(榜上的玩家不够5人)，或分数足够大，则入榜，
+		if (!win && (!in.good() || score > tscore))	// 没入榜的前提下，文件结束(榜上的玩家不够5人)，或分数足够大，则入榜，
 		{
 			cout << "恭喜你，以 "<<score<<" 分的成绩，夺得了第 " << i << " 名" << endl;
 			cout << "请输入你的名字，" << endl;
@@ -197,7 +197,7 @@ void over(int score)
 			win = true;//标记已入榜，下次循环不进这里，
 			stop();
 		}
-		if (in.eof())			// 文件结束则跳出循环，此次读取失败所以不写入临时文件，
+		if (!in.good())			// 文件结束则跳出循环，此次读取失败所以不写入临时文件，
 		{
 			break;
 		}
@@ -241,7 +241,7 @@ void top()
 	string name;
 	int score;
 	in >> name >> score;
-	for (int i = 1; !in.eof() && i <= 5; ++i)
+	for (int i = 1; in.good() && i <= 5; ++i)
 	{
 		cout << "第 " << i << " 名为 " << name << " ，分数为 " << score << " ，" << endl;
 		in >> name >> score;
