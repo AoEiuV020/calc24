@@ -1,14 +1,17 @@
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <cstdio>
+#include <cstdlib>
+#include <cmath>
 #include <time.h>
-#define DATA "calc24.dat"
-#define TEMP "calc24.dat~"
+#define DATA "calc24.dat"		// 记录排行榜的文件，
+#define TEMP "calc24.dat~"		// 修改排行榜时用到的临时文件，
 using namespace std;
-enum
+enum							// 枚举，状态值，
 { MENU = 1, GAME = 2, OVER = 3, TOP = 4, SETTING = 5, EXIT = 9 };
-int timelimit=30;//超时，单位秒，
+int timelimit = 30;				// 超时，单位秒，
 
 /*
  * 产生4个随机数，并计算出正确答案，返回是否能得到24点，
@@ -16,45 +19,252 @@ int timelimit=30;//超时，单位秒，
  * str保存一种正确情况， 返回bool， 能算出24点则返回真，
  * 否则返回假， 
  */
-bool calc24(int *n, string & str)
-{
-	n[0] = 1;
-	n[1] = 3;
-	n[2] = 5;
-	n[3] = 7;
-	str = "correct answer...";
-	return true;
-}
+bool calc24(int *n, string & str);
 
 /*
  * 数组n存着用来计算24点的那4个数字， str存玩家的输入，
  * b存那4个数能否算出24点， 返回答案是否正确， 
  */
+bool calc(const int *n, const string & str, bool b);
+
+/*
+ * 清屏函数， 
+ */
+void cls();
+
+/*
+ * 暂停函数， 
+ */
+void stop();
+/*
+ * 菜单函数， 
+ */
+int menu();
+
+/*
+ * 游戏本体， 参数times表示游戏的次数，
+ * 返回胜利的次数， 
+ */
+int game(int times);
+
+/*
+ * 游戏结束时，记录排名， 
+ */
+void over(int score);
+
+/*
+ * 设置游戏次数， 
+ */
+void setting(int &times);
+
+/*
+ * 输出排行榜， 
+ */
+void top();
+
+int main()
+{
+	int score;//记录分数，
+	int flag;//记录状态，
+	int times = 10;//游戏次数，
+	flag = MENU;
+	srand(time(0));//设置随机种子，
+	cls();
+	while (flag)
+	{
+		switch (flag)
+		{
+		case MENU:
+			flag = menu();
+			break;
+		case GAME:
+			score = game(times);
+			flag = OVER;
+			break;
+		case OVER:
+			over(score);
+			flag = MENU;
+			break;
+		case SETTING:
+			setting(times);
+			flag = MENU;
+			break;
+		case TOP:
+			top();
+			flag = MENU;
+			break;
+		case EXIT:
+			flag = 0;
+			break;
+		}
+		cls();
+	}
+}
+
+bool calc24(int *n, string & str)	// 生成4个随机数写入n，判断能否得到24，若能将答案写入str
+{
+	int a, b, c, d;
+	n[0] = rand() % 10 + 1;
+	n[1] = rand() % 10 + 1;
+	n[2] = rand() % 10 + 1;
+	n[3] = rand() % 10 + 1;
+	a = n[0];
+	b = n[1];
+	c = n[2];
+	d = n[3];
+	bool operatorchange(double e, double f, double g, double h, string & str);	// 穷举abcd所有排列
+	if (operatorchange(a, b, c, d, str))
+		return true;
+	if (operatorchange(a, b, d, c, str))
+		return true;
+	if (operatorchange(a, c, b, d, str))
+		return true;
+	if (operatorchange(a, c, d, b, str))
+		return true;
+	if (operatorchange(a, d, b, c, str))
+		return true;
+	if (operatorchange(a, d, c, b, str))
+		return true;
+	if (operatorchange(b, a, c, d, str))
+		return true;
+	if (operatorchange(b, a, d, c, str))
+		return true;
+	if (operatorchange(b, c, a, d, str))
+		return true;
+	if (operatorchange(b, c, d, a, str))
+		return true;
+	if (operatorchange(b, d, a, c, str))
+		return true;
+	if (operatorchange(b, d, c, a, str))
+		return true;
+	if (operatorchange(c, a, b, d, str))
+		return true;
+	if (operatorchange(c, a, d, b, str))
+		return true;
+	if (operatorchange(c, b, a, d, str))
+		return true;
+	if (operatorchange(c, b, d, a, str))
+		return true;
+	if (operatorchange(c, d, a, b, str))
+		return true;
+	if (operatorchange(c, d, b, a, str))
+		return true;
+	if (operatorchange(d, a, b, c, str))
+		return true;
+	if (operatorchange(d, a, c, b, str))
+		return true;
+	if (operatorchange(d, b, a, c, str))
+		return true;
+	if (operatorchange(d, b, c, a, str))
+		return true;
+	if (operatorchange(d, c, a, b, str))
+		return true;
+	if (operatorchange(d, c, b, a, str))
+		return true;
+	return false;
+}
+bool operatorchange(double x, double y, double z, double w, std::string & str)	// 穷举所有可能的运算方式，返回能否算得24，
+{
+	ostringstream os;
+	if ((abs(x + y + z + w - 24)) < 0.0001)
+		os << x << "+" << y << "+" << z << "+" << w << "=24" << endl;	// 将计算方式写入os
+	else if (abs(x + y + z - w - 24) < 0.0001)
+		os << x << "+" << y << "+" << z << "-" << w << "=24" << endl;	// 已去除重复或不能能状况例如x-y-z-w
+	else if (abs((x + y) * (z + w) - 24) < 0.0001)
+		os << "(" << x << "+" << y << ")*(" << z << "+" << w << ")=24" << endl;
+	else if (abs((x - y) * (z + w) - 24) < 0.0001)
+		os << "(" << x << "-" << y << ")*(" << z << "+" << w << ")=24" << endl;
+	else if (abs((x - y) * (z - w) - 24) < 0.0001)
+		os << "(" << x << "-" << y << ")*(" << z << "-" << w << ")=24" << endl;
+	else if (abs((x + y + z) * w - 24) < 0.0001)
+		os << "(" << x << "+" << y << "+" << z << ")*" << w << "=24" << endl;
+	else if (abs((x - y - z) * w - 24) < 0.0001)
+		os << "(" << x << "-" << y << "-" << z << ")*" << w << "=24" << endl;
+	else if (abs((x + y - z) * w - 24) < 0.0001)
+		os << "(" << x << "+" << y << "-" << z << ")*" << w << "=24" << endl;
+	else if (abs(x * y * z / w - 24) < 0.0001)
+		os << x << "*" << y << "*" << z << "/" << w << "=24" << endl;
+	else if (abs(x * y * (z + w) - 24) < 0.0001)
+		os << x << "*" << y << "*(" << z << "+" << w << ")=24" << endl;
+	else if (abs(x * y * (z - w) - 24) < 0.0001)
+		os << x << "*" << y << "*(" << z << "-" << w << ")=24" << endl;
+	else if (abs(x * y * z - w - 24) < 0.0001)
+		os << x << "*" << y << "*" << z << "-" << w << "=24" << endl;
+	else if (abs(x * y * z + w - 24) < 0.0001)
+		os << x << "*" << y << "*" << z << "+" << w << "=24" << endl;
+	else if (abs(x * y * z * w - 24) < 0.0001)
+		os << x << "*" << y << "*" << z << "*" << w << "=24" << endl;
+	else if (abs((x + y) + (z / w) - 24) < 0.0001)
+		os << "(" << x << "+" << y << ")+(" << z << "/" << w << ")" << "=24" << endl;
+	else if (abs((x + y) * (z / w) - 24) < 0.0001)
+		os << "(" << x << "+" << y << ")*(" << z << "/" << w << ")" << "=24" << endl;
+	else if (abs(x * y + z + w - 24) < 0.0001)
+		os << x << "*" << y << "+" << z << "+" << w << "=24" << endl;
+	else if (abs(x * y + z - w - 24) < 0.0001)
+		os << x << "*" << y << "+" << z << "-" << w << "=24" << endl;
+	else if (abs(x * y - z / w - 24) < 0.0001)
+		os << x << "*" << y << "-" << z << "/" << w << "=24" << endl;
+	else if (abs(x * y + z / w - 24) < 0.0001)
+		os << x << "*" << y << "+" << z << "/" << w << "=24" << endl;
+	else if (abs(x * y - z - w - 24) < 0.0001)
+		os << x << "*" << y << "-" << z << "-" << w << "=24" << endl;
+	else if (abs(x * y + z * w - 24) < 0.0001)
+		os << x << "*" << y << "+" << z << "*" << w << "" << "=24" << endl;
+	else if (abs(x * y - z * w - 24) < 0.0001)
+		os << x << "*" << y << "-" << z << "*" << w << "=24" << endl;
+	else if (abs(x * y / (z * w) - 24) < 0.0001)
+		os << x << "*" << y << "/(" << z << "*" << w << ")" << "=24" << endl;
+	else if (abs(x * y / (z - w) - 24) < 0.0001)
+		os << x << "*" << y << "/(" << z << "-" << w << ")" << "=24" << endl;
+	// x/(y z w) ，则y z
+	// w必须为小于w或y/z-w或(y-zy-z/w或y/z-w或(y-z)/w或y/(z+-*/w)
+	// else if (x/(y+z+w)-24)<0.0001)
+	// cout<<x<<</("<<y<<<<z<<""<<w<<")"<<"=24"<<endl;
+	// else if (x/(y+z-w)-24)<0.0001)
+	// cout<<x<<</("<<y<<<<z<<""<<w<<")"<<"=24"<<endl;
+	// else if (x/(y+z*w)-24)<0.0001)
+	// cout<<x<<</("<<y<<<<z<<""<<w<<")"<<"=24"<<endl;
+	else if (abs(x / (y - z / w) - 24) < 0.0001)
+		os << x << "/(" << y << "-" << z << "/" << w << ")" << "=24" << endl;
+	else if (abs(x / (y / z - w) - 24) < 0.0001)
+		os << x << "/(" << y << "/" << z << "-" << w << ")" << "=24" << endl;
+	else if (abs(x / ((y - z) / w) - 24) < 0.0001)
+		os << x << "/((" << y << "-" << z << ")/" << w << ")" << "=24" << endl;
+	else if (abs(x / (y / z / w) - 24) < 0.0001)
+		os << x << "/(" << y << "/" << z << "/" << w << ")" << "=24" << endl;
+	else if (abs(x / (y / (z + w)) - 24) < 0.0001)
+		os << x << "/(" << y << "/(" << z << "+" << w << ")" << "=24" << endl;
+	else if (abs(x / (y / (z - w)) - 24) < 0.0001)
+		os << x << "/(" << y << "/(" << z << "-" << w << ")" << "=24" << endl;
+	else if (abs(x / (y / (z * w)) - 24) < 0.0001)
+		os << x << "/(" << y << "/(" << z << "*" << w << ")" << "=24" << endl;
+	else if (abs(x / (y / (z / w)) - 24) < 0.0001)
+		os << x << "/(" << y << "/(" << z << "/" << w << ")" << "=24" << endl;
+	else
+		return false;
+	str = os.str();
+	return true;
+}
 bool calc(const int *n, const string & str, bool b)
 {
 	return true;
 }
 
-/*
- * 清屏函数， 
- */
 void cls()
 {
 #ifdef WIN32
 	system("cls");
 #else
-	cout << "\033[2J\033[0;0H";
+	// cout << "\033[2J\033[0;0H";
+	system("clear");
 #endif
 }
 
-/*
- * 暂停函数， 
- */
 void stop()
 {
 	cout << "输入回车继续，" << endl;
-	cin.ignore(100, '\n');
-	cin.get();
+	cin.ignore(100, '\n');		// 清空输入缓冲，假设输入缓冲小于100字符，
+	cin.get();					// 暂停，
 }
 
 int menu()
@@ -65,12 +275,12 @@ int menu()
 	cout << "*\t3,排行榜，" << endl;
 	cout << "*\t4,离开游戏，" << endl;
 	cout << "****************************" << endl;
-	bool flag = true;
-	while (flag)
+	bool flag = true;			// 循环标志，
+	while (flag)				// 输入错误的情况循环，
 	{
 		int choise = 0;
 		cin >> choise;
-		switch (choise)
+		switch (choise)			// 处理选择，
 		{
 		case 1:
 			return GAME;
@@ -94,10 +304,6 @@ int menu()
 	return EXIT;
 }
 
-/*
- * 游戏本体， 参数times表示游戏的次数，
- * 返回胜利的次数， 
- */
 int game(int times)
 {
 	int n[4];					// 存4个1-10的随机数，
@@ -124,7 +330,7 @@ int game(int times)
 		cout << "并且只能使用加、减、乘、除和括号，" << endl;
 		cout << "这四个数无法经过计算得到24，则输入0，" << endl;
 		cout << "认输则输入=，" << endl;
-		cout<<"超过 "<<timelimit<<" 秒就算失败，"<<endl;	// 输出提示信息，
+		cout << "超过 " << timelimit << " 秒就算失败，" << endl;	// 输出提示信息，
 		tstart = time(0);		// 开始计时，
 		cin >> player;			// 玩家输入答案，
 		tend = time(0);			// 计时结束，
@@ -136,16 +342,16 @@ int game(int times)
 		{
 			right = calc(n, player, can);	// 计算并返回玩家答案是否正确，
 		}
-		
-		cout<<"---------------"<<endl;//分割线，
+
+		cout << "---------------" << endl;	// 分割线，
 		cout << "这题做了 " << tend - tstart << " 秒，" << endl;
-		if(tend-tstart>timelimit)//超时提醒，
+		if (tend - tstart > timelimit)	// 超时提醒，
 		{
-			cout<<"可惜，超时了，"<<endl;
+			cout << "可惜，超时了，" << endl;
 		}
 		if (right)				// 如果正确，继续，
 		{
-			if(tend-tstart<=timelimit)//没超时则加一分，
+			if (tend - tstart <= timelimit)	// 没超时则加一分，
 			{
 				++score;
 			}
@@ -171,37 +377,35 @@ int game(int times)
 	return score;
 }
 
-/*
- * 游戏结束时，记录排名， 
- */
 void over(int score)
 {
-	ifstream in;//
-	ofstream out;//文件输入输出流，
+	ifstream in;				// 
+	ofstream out;				// 文件输入输出流，
 	string name;				// 当前玩家的名字，上排行榜的话要输入名字，
 	string tname;				// 
 	int tscore;					// 临时的名字和分数，存排行榜里的名字和分数，
 	bool win = false;			// 是否入榜，
 	in.open(DATA);				// 读打开数据文件，
 	out.open(TEMP);				// 写打开临时文件，
-	for (int i = 1; i <= 5; ++i)//循环5次，只记录5人，
+	for (int i = 1; i <= 5; ++i)	// 循环5次，只记录5人，
 	{
 		in >> tname >> tscore;
 		if (!win && (!in.good() || score > tscore))	// 没入榜的前提下，文件结束(榜上的玩家不够5人)，或分数足够大，则入榜，
 		{
-			cout << "恭喜你，以 "<<score<<" 分的成绩，夺得了第 " << i << " 名" << endl;
+			cout << "恭喜你，以 " << score << " 分的成绩，夺得了第 " << i << " 名"
+				<< endl;
 			cout << "请输入你的名字，" << endl;
 			cin >> name;
 			out << name << " " << score << endl;
-			cout<<"记录完成，"<<endl;
-			win = true;//标记已入榜，下次循环不进这里，
+			cout << "记录完成，" << endl;
+			win = true;			// 标记已入榜，下次循环不进这里，
 			stop();
 		}
 		if (!in.good())			// 文件结束则跳出循环，此次读取失败所以不写入临时文件，
 		{
 			break;
 		}
-		out << tname << " " << tscore << endl;//原排行榜的人仍然写入新排行榜，
+		out << tname << " " << tscore << endl;	// 原排行榜的人仍然写入新排行榜，
 	}
 	in.close();					// 
 	out.close();				// 关闭两个文件，
@@ -215,6 +419,7 @@ void over(int score)
 void setting(int &times)
 {
 	cout << "输入游戏次数，" << endl;
+	cout << "当前设置为， " << times << " 次，" << endl;
 	bool flag = true;
 	while (flag)
 	{
@@ -248,43 +453,4 @@ void top()
 	}
 	in.close();
 	stop();
-}
-
-int main()
-{
-	int score;
-	int flag;
-	int times = 10;
-	flag = MENU;
-	srand(time(0));
-	cls();
-	while (flag)
-	{
-		switch (flag)
-		{
-		case MENU:
-			flag = menu();
-			break;
-		case GAME:
-			score = game(times);
-			flag = OVER;
-			break;
-		case OVER:
-			over(score);
-			flag = MENU;
-			break;
-		case SETTING:
-			setting(times);
-			flag = MENU;
-			break;
-		case TOP:
-			top();
-			flag = MENU;
-			break;
-		case EXIT:
-			flag = 0;
-			break;
-		}
-		cls();
-	}
 }
