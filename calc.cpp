@@ -9,7 +9,7 @@ using namespace std;
 enum
 { MENU = 1, GAME = 2, OVER = 3, TOP = 4, SETTING = 5, EXIT = 9 };
 
-/* 
+/*
  * 产生4个随机数，并计算出正确答案，返回是否能得到24点，
  * 数组n有4个int空间，保存这4个随机数，
  * str保存一种正确情况， 返回bool， 能算出24点则返回真，
@@ -25,7 +25,7 @@ bool calc24(int *n, string & str)
 	return true;
 }
 
-/* 
+/*
  * 数组n存着用来计算24点的那4个数字， str存玩家的输入，
  * b存那4个数能否算出24点， 返回答案是否正确， 
  */
@@ -34,8 +34,9 @@ bool calc(const int *n, const string & str, bool b)
 	return true;
 }
 
-/* 
-   清屏函数， */
+/*
+ * 清屏函数， 
+ */
 void cls()
 {
 #ifdef WIN32
@@ -45,8 +46,9 @@ void cls()
 #endif
 }
 
-/* 
-   暂停函数， */
+/*
+ * 暂停函数， 
+ */
 void stop()
 {
 	cout << "输入回车继续，" << endl;
@@ -59,7 +61,7 @@ int menu()
 	cout << "****************************" << endl;
 	cout << "*\t1,开始游戏，" << endl;
 	cout << "*\t2,设置游戏次数，" << endl;
-	cout << "*\t3,排名，" << endl;
+	cout << "*\t3,排行榜，" << endl;
 	cout << "*\t4,离开游戏，" << endl;
 	cout << "****************************" << endl;
 	bool flag = true;
@@ -91,7 +93,7 @@ int menu()
 	return EXIT;
 }
 
-/* 
+/*
  * 游戏本体， 参数times表示游戏的次数，
  * 返回胜利的次数， 
  */
@@ -158,43 +160,45 @@ int game(int times)
 	return score;
 }
 
-/* 
+/*
  * 游戏结束时，记录排名， 
  */
 void over(int score)
 {
-	ifstream in;
-	ofstream out;
+	ifstream in;//
+	ofstream out;//文件输入输出流，
 	string name;				// 当前玩家的名字，上排行榜的话要输入名字，
 	string tname;				// 
-	int tscore;					// 临时的名字和分数，存排名里的名字和分数，
+	int tscore;					// 临时的名字和分数，存排行榜里的名字和分数，
 	bool win = false;			// 是否入榜，
-	in.open(DATA);//读打开数据文件，
-	out.open(TEMP);//写打开临时文件，
-	for (int i = 1; i <= 5; ++i)
+	in.open(DATA);				// 读打开数据文件，
+	out.open(TEMP);				// 写打开临时文件，
+	for (int i = 1; i <= 5; ++i)//循环5次，只记录5人，
 	{
 		in >> tname >> tscore;
-		if (!win && (in.eof() || score > tscore))//没入榜的前提下，文件结束(榜上的玩家不够5人)，或分数足够大，则入榜，
+		if (!win && (in.eof() || score > tscore))	// 没入榜的前提下，文件结束(榜上的玩家不够5人)，或分数足够大，则入榜，
 		{
 			cout << "恭喜你，夺得了第 " << i << " 名" << endl;
 			cout << "请输入你的名字，" << endl;
 			cin >> name;
 			out << name << " " << score << endl;
-			win = true;
+			cout<<"记录完成，"<<endl;
+			win = true;//标记已入榜，下次循环不进这里，
 		}
-		if(!in.eof())//文件结束则跳出循环，此次读取失败所以不写入临时文件，
+		if (in.eof())			// 文件结束则跳出循环，此次读取失败所以不写入临时文件，
 		{
 			break;
 		}
-		out << tname << " " << tscore << endl;
+		out << tname << " " << tscore << endl;//原排行榜的人仍然写入新排行榜，
 	}
-	in.close();//
-	out.close();//关闭两个文件，
-	in.open(TEMP);//
+	in.close();					// 
+	out.close();				// 关闭两个文件，
+	in.open(TEMP);				// 
 	out.open(DATA);
 	out << in.rdbuf();
 	in.close();
-	out.close();//把临时文件复制到数据文件，
+	out.close();				// 把临时文件复制到数据文件，
+	stop();
 }
 
 void setting(int &times)
