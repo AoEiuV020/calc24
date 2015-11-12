@@ -486,14 +486,14 @@ int menu()
 }
 
 /*
-   检测输入是否含有不允许的字符，
-*/
+ * 检测输入是否含有不允许的字符， 
+ */
 bool error(string player)
 {
-	string chs="1234567890+-*/()";
-	for (unsigned i=0;i<player.size();++i)
+	string chs = "1234567890+-*/()";
+	for (unsigned i = 0; i < player.size(); ++i)
 	{
-		if(chs.find(player[i])!=string::npos)	
+		if (chs.find(player[i]) != string::npos)
 		{
 			continue;
 		}
@@ -501,6 +501,7 @@ bool error(string player)
 	}
 	return false;
 }
+
 int game(int times)
 {
 	int n[4];					// 存4个1-10的随机数，
@@ -531,10 +532,10 @@ int game(int times)
 		cout << "超过 " << timelimit << " 秒就算失败，" << endl;	// 输出提示信息，
 		tstart = time(0);		// 开始计时，
 		cin >> player;			// 玩家输入答案，
-		while(error(player))	// 如果输入有错误字符，比如字母a，
+		while (error(player))	// 如果输入有错误字符，比如字母a，
 		{
-			cout<<"输入错误，重新输入，"<<endl;
-			cin >> player;			// 玩家重新输入答案，
+			cout << "输入错误，重新输入，" << endl;
+			cin >> player;		// 玩家重新输入答案，
 		}
 		tend = time(0);			// 计时结束，
 		if (player == "+")
