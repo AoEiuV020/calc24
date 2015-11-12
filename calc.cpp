@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <stack>
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>
@@ -9,9 +10,11 @@
 #define DATA "calc24.dat"		// 记录排行榜的文件，
 #define TEMP "calc24.dat~"		// 修改排行榜时用到的临时文件，
 using namespace std;
+stack<char> opr_stk; 
+stack<double> num_stk; 
 enum							// 枚举，状态值，
 { MENU = 1, GAME = 2, OVER = 3, TOP = 4, SETTING = 5, EXIT = 9 };
-int timelimit = 30;				// 超时，单位秒，
+int timelimit = 90;				// 超时，单位秒，
 
 /*
  * 产生4个随机数，并计算出正确答案，返回是否能得到24点，
@@ -245,10 +248,176 @@ bool operatorchange(double x, double y, double z, double w, std::string & str)	/
 	str = os.str();
 	return true;
 }
-bool calc(const int *n, const string & str, bool b)
+
+bool calc(int *n,const string &str,bool b)
 {
-	return true;
+	
+	void pop_cal(); 
+	int p_Rank(char); 
+	int i=0,j=0; //i,j为循环变量
+    bool num_flag=0; 
+    double x=0; //x为玩家输入的字符串中的数字
+	int xi=0;//xi是为了用来判断每个给出的数字是否用且只用了一次
+	while(!num_stk.empty())
+	{
+		num_stk.pop();
+	}
+	while(!opr_stk.empty())
+	{
+		opr_stk.pop();
+	}
+	if(str[0]=='0')
+	{
+		if(b==0)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	} //判断玩家输入的是否为0，并和正确答案作比较
+	else
+	{
+		for(i=0;i<str.size();i++)
+		{
+            if((str[i]>='0')&&(str[i]<='9'))//筛选出字符为数字的元素
+			{
+                x=x*10+str[i]-'0'; //玩家输入的数字
+				xi=xi*10+str[i]-'0'; //再存一次玩家输入的数字，用来判断是否用了给的数字
+                num_flag=1; 
+                if(i==str.size()-1)
+				{
+                    num_stk.push(x);//将数字推入栈中
+					for(j=0;j<4;j++)
+					{
+						if(xi==n[j])
+						{
+							n[j]=0;//用了给出的数字，则将其赋值0，表示已经用了给的数字
+							break;
+						}
+					}
+					if(j==4)
+					{
+						return false;//循环走出来了，代表玩家并没有用到给的数字，答案错误
+					}
+					if(xi==0)
+					{
+						return false;//不会出现数字0，所以出现判定为用没给的数字，答案错误
+
+					}
+				}
+			} 
+			else
+			{
+				if(x)
+				{
+					num_stk.push(x); 
+					for(j=0;j<4;j++)
+					{
+						if(xi==n[j])
+						{
+							n[j]=0;//用了给出的数字，则将其赋值0，表示已经用了给的数字
+							break;
+						}
+					}
+					if(j==4)
+					{
+						return false;//循环走出来了，代表玩家并没有用到给的数字，答案错误
+					}
+					if(xi==0)
+					{
+						return false;//不会出现数字0，所以出现判定为用没给的数字，答案错误
+					}
+					x=0;
+					xi=0;
+					num_flag=0; 
+				} 
+				if(opr_stk.empty())
+					opr_stk.push(str[i]);//字符串结束，依次出栈
+				else if(str[i]=='(') 
+					opr_stk.push(str[i]); 
+				else if(str[i]==')') 
+				{
+					while(opr_stk.top()!='(') 
+						pop_cal();                 
+					opr_stk.pop(); //出现括号的处理
+				} 
+				else if(p_Rank(str[i])<=p_Rank(opr_stk.top())) 
+				{
+					pop_cal(); 
+					opr_stk.push(str[i]); 
+				}  //加减乘除括号优先级的处理
+				else
+				{
+					opr_stk.push(str[i]); 
+				} 
+			} 
+		}
+		while(!opr_stk.empty())
+			pop_cal(); 
+		double res=num_stk.top();//表达式的结果
+
+		for(j=0;j<4;j++)
+		{
+			if(n[j]!=0)//用了给的数字，所有数字都会被赋值为0，所以不为0即答案错误
+			{
+				return false;
+			}
+		}
+		if(fabs(res)-24<0.00001)//表达式所算出的答案是否为24
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 }
+void pop_cal() //计算表达式的结果
+{ 
+	char op=opr_stk.top(); 
+	double a,b,res; 
+	b=num_stk.top(); 
+	num_stk.pop(); 
+	a=num_stk.top();
+	num_stk.pop();//得到的数字依次出栈
+	switch(op) 
+	{ 
+		case '+': 
+			res=a+b; 
+			break; 
+		case '-': 
+			res=a-b; 
+			break; 
+		case '*': 
+			res=a*b; 
+			break; 
+		case '/': 
+			res=a/b; //加减乘除的加入，得出结果
+			break; 
+		default: 
+			break; 
+	} 
+	num_stk.push(res);//即为答案
+	opr_stk.pop(); //答案出栈
+} 
+
+int p_Rank(char x) //优先级
+{ 
+	if(x=='(') 
+		return 0; 
+	else if(x=='+') 
+		return 1; 
+	else if(x=='-') 
+		return 2; 
+	else if(x=='*') 
+		return 3; 
+	else if(x=='/') 
+		return 4; 
+}  
 
 void cls()
 {
@@ -282,23 +451,23 @@ int menu()
 		cin >> choise;
 		switch (choise)			// 处理选择，
 		{
-		case 1:
-			return GAME;
-			break;
-		case 2:
-			return SETTING;
-			break;
-		case 3:
-			return TOP;
-			break;
-		case 4:
-			return EXIT;
-			break;
-		default:
-			cout << "输入错误，重新输入，" << endl;
-			cin.clear();
-			cin.ignore(100, '\n');
-			break;
+			case 1:
+				return GAME;
+				break;
+			case 2:
+				return SETTING;
+				break;
+			case 3:
+				return TOP;
+				break;
+			case 4:
+				return EXIT;
+				break;
+			default:
+				cout << "输入错误，重新输入，" << endl;
+				cin.clear();
+				cin.ignore(100, '\n');
+				break;
 		}
 	}
 	return EXIT;
@@ -356,7 +525,14 @@ int game(int times)
 				++score;
 			}
 			cout << "答案正确，" << endl;
-			cout << player << " == 24 " << endl;
+			if (can)			// 如果有答案，输出正确答案，
+			{
+				cout << player << " == 24 " << endl;
+			}
+			else				// 如果没答案，
+			{
+				cout << "其实这4个数字是得不到24点的，" << endl;
+			}
 		}
 		else					// 如果错误，游戏结束，
 		{
