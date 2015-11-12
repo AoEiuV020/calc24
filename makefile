@@ -13,6 +13,7 @@ ifeq ($(shell uname 2>&1),Linux)
 else
 	WINDOWS=1
 endif
+WINDOWS=0
 #######上面是判断系统是不是WINDOWS,准不准无所谓了，能用就好。。。
 ifeq ($(WINDOWS),1)
 	SHELL=cmd.exe
