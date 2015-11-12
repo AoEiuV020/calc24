@@ -10,8 +10,8 @@
 #define DATA "calc24.dat"		// 记录排行榜的文件，
 #define TEMP "calc24.dat~"		// 修改排行榜时用到的临时文件，
 using namespace std;
-stack<char> opr_stk;
-stack<double> num_stk;
+stack < char >opr_stk;
+stack < double >num_stk;
 enum							// 枚举，状态值，
 { MENU = 1, GAME = 2, OVER = 3, TOP = 4, SETTING = 5, EXIT = 9 };
 int timelimit = 90;				// 超时，单位秒，
@@ -67,11 +67,11 @@ void top();
 
 int main()
 {
-	int score;//记录分数，
-	int flag;//记录状态，
-	int times = 10;//游戏次数，
+	int score;					// 记录分数，
+	int flag;					// 记录状态，
+	int times = 10;				// 游戏次数，
 	flag = MENU;
-	srand(time(0));//设置随机种子，
+	srand(time(0));				// 设置随机种子，
 	cls();
 	while (flag)
 	{
@@ -166,6 +166,7 @@ bool calc24(int *n, string & str)	// 生成4个随机数写入n，判断能否�
 		return true;
 	return false;
 }
+
 bool operatorchange(double x, double y, double z, double w, std::string & str)	// 穷举所有可能的运算方式，返回能否算得24，
 {
 	ostringstream os;
@@ -211,7 +212,7 @@ bool operatorchange(double x, double y, double z, double w, std::string & str)	/
 		os << x << "*(" << y << "+" << z << ")-" << w << "=24" << endl;
 	else if (abs(x * y - z / w - 24) < 0.0001)
 		os << x << "*" << y << "-" << z << "/" << w << "=24" << endl;
-	else if (abs((x * y - z )/ w - 24) < 0.0001)
+	else if (abs((x * y - z) / w - 24) < 0.0001)
 		os << x << "(*" << y << "-" << z << ")/" << w << "=24" << endl;
 	else if (abs(x * y + z / w - 24) < 0.0001)
 		os << x << "*" << y << "+" << z << "/" << w << "=24" << endl;
@@ -259,26 +260,26 @@ bool operatorchange(double x, double y, double z, double w, std::string & str)	/
 	return true;
 }
 
-bool calc(int *n,const string &str,bool b)
+bool calc(int *n, const string & str, bool b)
 {
 
 	void pop_cal();
 	int p_Rank(char);
-	int i=0,j=0; //i,j为循环变量
-    bool num_flag=0;
-    double x=0; //x为玩家输入的字符串中的数字
-	int xi=0;//xi是为了用来判断每个给出的数字是否用且只用了一次
-	while(!num_stk.empty())
+	int i = 0, j = 0;			// i,j为循环变量
+	bool num_flag = 0;
+	double x = 0;				// x为玩家输入的字符串中的数字
+	int xi = 0;					// xi是为了用来判断每个给出的数字是否用且只用了一次
+	while (!num_stk.empty())
 	{
 		num_stk.pop();
 	}
-	while(!opr_stk.empty())
+	while (!opr_stk.empty())
 	{
 		opr_stk.pop();
 	}
-	if(str[0]=='0')
+	if (str[0] == '0')
 	{
-		if(b==0)
+		if (b == 0)
 		{
 			return true;
 		}
@@ -286,96 +287,96 @@ bool calc(int *n,const string &str,bool b)
 		{
 			return false;
 		}
-	} //判断玩家输入的是否为0，并和正确答案作比较
+	}							// 判断玩家输入的是否为0，并和正确答案作比较
 	else
 	{
-		for(i=0;i<str.size();i++)
+		for (i = 0; i < str.size(); i++)
 		{
-            if((str[i]>='0')&&(str[i]<='9'))//筛选出字符为数字的元素
+			if ((str[i] >= '0') && (str[i] <= '9'))	// 筛选出字符为数字的元素
 			{
-                x=x*10+str[i]-'0'; //玩家输入的数字
-				xi=xi*10+str[i]-'0'; //再存一次玩家输入的数字，用来判断是否用了给的数字
-                num_flag=1;
-                if(i==str.size()-1)
+				x = x * 10 + str[i] - '0';	// 玩家输入的数字
+				xi = xi * 10 + str[i] - '0';	// 再存一次玩家输入的数字，用来判断是否用了给的数字
+				num_flag = 1;
+				if (i == str.size() - 1)
 				{
-                    num_stk.push(x);//将数字推入栈中
-					for(j=0;j<4;j++)
+					num_stk.push(x);	// 将数字推入栈中
+					for (j = 0; j < 4; j++)
 					{
-						if(xi==n[j])
+						if (xi == n[j])
 						{
-							n[j]=0;//用了给出的数字，则将其赋值0，表示已经用了给的数字
+							n[j] = 0;	// 用了给出的数字，则将其赋值0，表示已经用了给的数字
 							break;
 						}
 					}
-					if(j==4)
+					if (j == 4)
 					{
-						return false;//循环走出来了，代表玩家并没有用到给的数字，答案错误
+						return false;	// 循环走出来了，代表玩家并没有用到给的数字，答案错误
 					}
-					if(xi==0)
+					if (xi == 0)
 					{
-						return false;//不会出现数字0，所以出现判定为用没给的数字，答案错误
+						return false;	// 不会出现数字0，所以出现判定为用没给的数字，答案错误
 
 					}
 				}
 			}
 			else
 			{
-				if(x)
+				if (x)
 				{
 					num_stk.push(x);
-					for(j=0;j<4;j++)
+					for (j = 0; j < 4; j++)
 					{
-						if(xi==n[j])
+						if (xi == n[j])
 						{
-							n[j]=0;//用了给出的数字，则将其赋值0，表示已经用了给的数字
+							n[j] = 0;	// 用了给出的数字，则将其赋值0，表示已经用了给的数字
 							break;
 						}
 					}
-					if(j==4)
+					if (j == 4)
 					{
-						return false;//循环走出来了，代表玩家并没有用到给的数字，答案错误
+						return false;	// 循环走出来了，代表玩家并没有用到给的数字，答案错误
 					}
-					if(xi==0)
+					if (xi == 0)
 					{
-						return false;//不会出现数字0，所以出现判定为用没给的数字，答案错误
+						return false;	// 不会出现数字0，所以出现判定为用没给的数字，答案错误
 					}
-					x=0;
-					xi=0;
-					num_flag=0;
+					x = 0;
+					xi = 0;
+					num_flag = 0;
 				}
-				if(opr_stk.empty())
-					opr_stk.push(str[i]);//字符串结束，依次出栈
-				else if(str[i]=='(')
+				if (opr_stk.empty())
+					opr_stk.push(str[i]);	// 字符串结束，依次出栈
+				else if (str[i] == '(')
 					opr_stk.push(str[i]);
-				else if(str[i]==')')
+				else if (str[i] == ')')
 				{
-					while(opr_stk.top()!='(')
+					while (opr_stk.top() != '(')
 						pop_cal();
-					opr_stk.pop(); //出现括号的处理
+					opr_stk.pop();	// 出现括号的处理
 				}
-				else if(p_Rank(str[i])<=p_Rank(opr_stk.top()))
+				else if (p_Rank(str[i]) <= p_Rank(opr_stk.top()))
 				{
 					pop_cal();
 					opr_stk.push(str[i]);
-				}  //加减乘除括号优先级的处理
+				}				// 加减乘除括号优先级的处理
 				else
 				{
 					opr_stk.push(str[i]);
 				}
 			}
 		}
-		while(!opr_stk.empty())
+		while (!opr_stk.empty())
 			pop_cal();
-		double res=num_stk.top();//表达式的结果
+		double res = num_stk.top();	// 表达式的结果
 
-		for(j=0;j<4;j++)
+		for (j = 0; j < 4; j++)
 		{
-			if(n[j]!=0)//用了给的数字，所有数字都会被赋值为0，所以不为0即答案错误
+			if (n[j] != 0)		// 用了给的数字，所有数字都会被赋值为0，所以不为0即答案错误
 			{
 				return false;
 			}
 		}
-		if(fabs(res)-24<0.00001)//表达式所算出的答案是否为24
+		if (fabs(res) - 24 < 0.00001)	// 表达式所算出的答案是否为24
 		{
 			return true;
 		}
@@ -386,46 +387,47 @@ bool calc(int *n,const string &str,bool b)
 	}
 
 }
-void pop_cal() //计算表达式的结果
+
+void pop_cal()					// 计算表达式的结果
 {
-	char op=opr_stk.top();
-	double a,b,res;
-	b=num_stk.top();
+	char op = opr_stk.top();
+	double a, b, res;
+	b = num_stk.top();
 	num_stk.pop();
-	a=num_stk.top();
-	num_stk.pop();//得到的数字依次出栈
-	switch(op)
+	a = num_stk.top();
+	num_stk.pop();				// 得到的数字依次出栈
+	switch (op)
 	{
-		case '+':
-			res=a+b;
-			break;
-		case '-':
-			res=a-b;
-			break;
-		case '*':
-			res=a*b;
-			break;
-		case '/':
-			res=a/b; //加减乘除的加入，得出结果
-			break;
-		default:
-			break;
+	case '+':
+		res = a + b;
+		break;
+	case '-':
+		res = a - b;
+		break;
+	case '*':
+		res = a * b;
+		break;
+	case '/':
+		res = a / b;			// 加减乘除的加入，得出结果
+		break;
+	default:
+		break;
 	}
-	num_stk.push(res);//即为答案
-	opr_stk.pop(); //答案出栈
+	num_stk.push(res);			// 即为答案
+	opr_stk.pop();				// 答案出栈
 }
 
-int p_Rank(char x) //优先级
+int p_Rank(char x)				// 优先级
 {
-	if(x=='(')
+	if (x == '(')
 		return 0;
-	else if(x=='+')
+	else if (x == '+')
 		return 1;
-	else if(x=='-')
+	else if (x == '-')
 		return 2;
-	else if(x=='*')
+	else if (x == '*')
 		return 3;
-	else if(x=='/')
+	else if (x == '/')
 		return 4;
 }
 
@@ -461,28 +463,44 @@ int menu()
 		cin >> choise;
 		switch (choise)			// 处理选择，
 		{
-			case 1:
-				return GAME;
-				break;
-			case 2:
-				return SETTING;
-				break;
-			case 3:
-				return TOP;
-				break;
-			case 4:
-				return EXIT;
-				break;
-			default:
-				cout << "输入错误，重新输入，" << endl;
-				cin.clear();
-				cin.ignore(100, '\n');
-				break;
+		case 1:
+			return GAME;
+			break;
+		case 2:
+			return SETTING;
+			break;
+		case 3:
+			return TOP;
+			break;
+		case 4:
+			return EXIT;
+			break;
+		default:
+			cout << "输入错误，重新输入，" << endl;
+			cin.clear();
+			cin.ignore(100, '\n');
+			break;
 		}
 	}
 	return EXIT;
 }
 
+/*
+   检测输入是否含有不允许的字符，
+*/
+bool error(string player)
+{
+	string chs="1234567890+-*/()";
+	for (unsigned i=0;i<player.size();++i)
+	{
+		if(chs.find(player[i])!=string::npos)	
+		{
+			continue;
+		}
+		return true;
+	}
+	return false;
+}
 int game(int times)
 {
 	int n[4];					// 存4个1-10的随机数，
@@ -492,19 +510,20 @@ int game(int times)
 	bool right;					// 存玩家答案是否正确，
 	int tstart, tend;			// 计时，
 	int score;					// 胜利次数，
+	bool error(string player);	// 检测输入是否有错误字符的函数，
 
 	score = 0;					// 初始化，
 	while (times-- > 0)
 	{
 		cls();
 		can = calc24(n, answer);	// 产生4个随机数，并计算出正确答案，返回是否能得到24点，
-		cout << n[0];			//
+		cout << n[0];			// 
 		for (int i = 1; i < 4; ++i)
 		{
 			cout << ";" << n[i];
 		}
 		cout << endl;			// 输出4个随机数，
-		cout << "计算24点，" << endl;	//
+		cout << "计算24点，" << endl;	// 
 		cout << "输入含有这4 个数字的一个完整计算式子，" << endl;
 		cout << "并且只能使用加、减、乘、除和括号，" << endl;
 		cout << "这四个数无法经过计算得到24，则输入0，" << endl;
@@ -512,6 +531,11 @@ int game(int times)
 		cout << "超过 " << timelimit << " 秒就算失败，" << endl;	// 输出提示信息，
 		tstart = time(0);		// 开始计时，
 		cin >> player;			// 玩家输入答案，
+		while(error(player))	// 如果输入有错误字符，比如字母a，
+		{
+			cout<<"输入错误，重新输入，"<<endl;
+			cin >> player;			// 玩家重新输入答案，
+		}
 		tend = time(0);			// 计时结束，
 		if (player == "+")
 		{
@@ -569,10 +593,10 @@ int game(int times)
 
 void over(int score)
 {
-	ifstream in;				//
+	ifstream in;				// 
 	ofstream out;				// 文件输入输出流，
 	string name;				// 当前玩家的名字，上排行榜的话要输入名字，
-	string tname;				//
+	string tname;				// 
 	int tscore;					// 临时的名字和分数，存排行榜里的名字和分数，
 	bool win = false;			// 是否入榜，
 	in.open(DATA);				// 读打开数据文件，
@@ -597,9 +621,9 @@ void over(int score)
 		}
 		out << tname << " " << tscore << endl;	// 原排行榜的人仍然写入新排行榜，
 	}
-	in.close();					//
+	in.close();					// 
 	out.close();				// 关闭两个文件，
-	in.open(TEMP);				//
+	in.open(TEMP);				// 
 	out.open(DATA);
 	out << in.rdbuf();
 	in.close();
