@@ -269,11 +269,11 @@ bool calc(int *n, const string & str, bool b)
 	bool num_flag = 0;
 	double x = 0;				// x为玩家输入的字符串中的数字
 	int xi = 0;					// xi是为了用来判断每个给出的数字是否用且只用了一次
-	while (!num_stk.empty())
+	while (!num_stk.empty())	// 清空num_stk，
 	{
 		num_stk.pop();
 	}
-	while (!opr_stk.empty())
+	while (!opr_stk.empty())	// 清空opr_stk，
 	{
 		opr_stk.pop();
 	}
@@ -528,7 +528,8 @@ int game(int times)
 		cout << "输入含有这4 个数字的一个完整计算式子，" << endl;
 		cout << "并且只能使用加、减、乘、除和括号，" << endl;
 		cout << "这四个数无法经过计算得到24，则输入0，" << endl;
-		cout << "认输则输入=，" << endl;
+		cout << "这局认输则输入=，" << endl;
+		cout << "游戏结束则输入+，" << endl;
 		cout << "超过 " << timelimit << " 秒就算失败，" << endl;	// 输出提示信息，
 		tstart = time(0);		// 开始计时，
 		cin >> player;			// 玩家输入答案，
@@ -538,11 +539,11 @@ int game(int times)
 			cin >> player;		// 玩家重新输入答案，
 		}
 		tend = time(0);			// 计时结束，
-		if (player == "+")
+		if (player == "+")		// 不玩了，游戏结束，
 		{
 			return score;
 		}
-		else if (player == "=")
+		else if (player == "=")	// 这局认输，
 		{
 			right = false;
 		}
